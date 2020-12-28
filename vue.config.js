@@ -1,6 +1,7 @@
 const path = require("path");
 const resolve = dir => path.join(__dirname, dir);
 const IS_PROD = ["production", "prod"].includes(process.env.NODE_ENV);
+// const IS_PROD = true
 const glob = require("glob");
 const pagesInfo = require("./pages.config");
 const pages = {};
@@ -12,12 +13,12 @@ glob.sync('./src/pages/**/main.js').forEach(entry => {
         pages[chunk] = {
             entry,
             ...curr,
-            chunk: ["chunk-vendors", "chunk-common", chunk]
+            chunks: ["chunk-vendors", "chunk-common", chunk]
         }
     }
 })
 
-
+console.log(pages)
 module.exports = {
     publicPath: IS_PROD ? process.env.VUE_APP_PUBLIC_PATH : "./", // 默认'/'，部署应用包时的基本 URL
     // outputDir: process.env.outputDir || 'dist', // 'dist', 生产环境构建文件的目录
@@ -45,22 +46,16 @@ module.exports = {
         }
     },
     configureWebpack: (config) => {
-        // config.externals = {
-        //     'Vue': 'vue',
-        //     'VueRouter': 'vue-router',
-        //     'ElementUI': 'element-ui',
-        //     Vuex: "vuex",
-        //     axios: "axios"
-        // };
 
-        config.externals = {
-            vue: "Vue",
-            "element-ui": "ELEMENT",
-            "vue-router": "VueRouter",
-            vuex: "Vuex",
-            axios: "axios"
-        };
         if (IS_PROD) {
+            config.externals = {
+                vue: "Vue",
+                "element-ui": "ELEMENT",
+                "vue-router": "VueRouter",
+                vuex: "Vuex",
+                axios: "axios"
+            };
+
             config.optimization = {
                 splitChunks: {
                     cacheGroups: {
@@ -82,10 +77,15 @@ module.exports = {
                             reuseExistingChunk: true,
                             enforce: true
                         },
+                        // elementUI: {
+                        //     name: 'chunk-elementUI', // split elementUI into a single package
+                        //     priority: 20, // the weight needs to be larger than libs and app or it will be packaged into libs or app
+                        //     test: /[\\/]node_modules[\\/]_?element-ui(.*)/ // in order to adapt to cnpm
+                        // },
                         elementUI: {
                             name: "chunk-elementui",
                             test: /[\\/]node_modules[\\/]element-ui[\\/]/,
-                            chunks: "all",
+                            chunks: "async",
                             priority: 3,
                             reuseExistingChunk: true,
                             enforce: true
@@ -101,9 +101,17 @@ module.exports = {
                     }
                 }
             };
-            let plugins = [];
-            config.plugins = [...config.plugins, ...plugins];
+        } else {
+            config.externals = {
+                'Vue': 'vue',
+                'VueRouter': 'vue-router',
+                'ELEMENT': 'element-ui',
+                Vuex: "vuex",
+                axios: "axios"
+            };
+
         }
+
     },
     chainWebpack: (config) => {
         config.resolve.alias
@@ -118,6 +126,7 @@ module.exports = {
             .set("@store", resolve("src/store"))
             .set("@layouts", resolve("src/layouts"))
             .set("@static", resolve("src/static"));
+
         if (IS_PROD) {
             const cdn = {
                 // 访问https://unpkg.com/element-ui/lib/theme-chalk/index.css获取最新版本
@@ -130,14 +139,19 @@ module.exports = {
                     "//unpkg.com/element-ui@2.14.1/lib/index.js"
                 ]
             };
+
+            // config.plugin(`html`).tap(args => {
+            //     // html中添加cdn
+            //     args[0].cdn = cdn;
+
+            //     // 修复 Lazy loading routes Error
+            //     args[0].chunksSortMode = "none";
+            //     return args;
+            // });
+
+
             Object.keys(pagesInfo).forEach(page => {
-                // config.plugin(`preload-${page}`).tap(() => [{
-                //     rel: 'preload',
-                //     // to ignore runtime.js
-                //     // https://github.com/vuejs/vue-cli/blob/dev/packages/@vue/cli-service/lib/config/app.js#L171
-                //     fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
-                //     include: 'initial'
-                // }])
+
                 config.plugin(`html-${page}`).tap(args => {
                     // html中添加cdn
                     args[0].cdn = cdn;
@@ -146,9 +160,21 @@ module.exports = {
                     args[0].chunksSortMode = "none";
                     return args;
                 });
-                // config.plugins.delete(`prefetch-${page}`)
-            });
 
+
+                // config.plugin(`preload-${page}`).tap(() => [{
+                //     rel: 'preload',
+                //     // to ignore runtime.js
+                //     // https://github.com/vuejs/vue-cli/blob/dev/packages/@vue/cli-service/lib/config/app.js#L171
+                //     fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
+                //     // include: 'initial'
+                //     include: []
+                // }])
+                // config.plugins.delete(`prefetch-${page}`);
+                // config.plugins.delete(`preload-${page}`)
+            });
+            //     // config.optimization.delete("splitChunks");
+            //     // config.optimization.runtimeChunk('single')
         }
     }
 }
