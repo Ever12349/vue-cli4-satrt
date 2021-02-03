@@ -18,7 +18,7 @@ glob.sync('./src/pages/**/main.js').forEach(entry => {
     }
 })
 
-console.log(pages)
+console.log(IS_PROD, process.env.NODE_ENV, "IS_PROD")
 module.exports = {
     publicPath: IS_PROD ? process.env.VUE_APP_PUBLIC_PATH : "./", // 默认'/'，部署应用包时的基本 URL
     // outputDir: process.env.outputDir || 'dist', // 'dist', 生产环境构建文件的目录
@@ -53,7 +53,8 @@ module.exports = {
                 "element-ui": "ELEMENT",
                 "vue-router": "VueRouter",
                 vuex: "Vuex",
-                axios: "axios"
+                axios: "axios",
+                moment: 'moment'
             };
 
             config.optimization = {
@@ -136,7 +137,8 @@ module.exports = {
                     "//unpkg.com/vue-router@3.2.0/dist/vue-router.min.js",
                     "//unpkg.com/vuex@3.4.0/dist/vuex.min.js",
                     "//unpkg.com/axios@0.21.1/dist/axios.min.js",
-                    "//unpkg.com/element-ui@2.14.1/lib/index.js"
+                    "//unpkg.com/element-ui@2.14.1/lib/index.js",
+                    "//cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"
                 ]
             };
 
@@ -176,5 +178,28 @@ module.exports = {
             //     // config.optimization.delete("splitChunks");
             //     // config.optimization.runtimeChunk('single')
         }
+    },
+    devServer: {
+        // overlay: { // 让浏览器 overlay 同时显示警告和错误
+        //   warnings: true,
+        //   errors: true
+        // },
+        open: true, // 是否打开浏览器
+        // host: "localhost",
+        // port: "8080", // 代理断就
+        // https: false,
+        hotOnly: true, // 热更新
+        proxy: {
+            "/api": {
+                target: "https://www.easy-mock.com/mock/5bc75b55dc36971c160cad1b/sheets", // 目标代理接口地址
+                secure: false,
+                changeOrigin: true, // 开启代理，在本地创建一个虚拟服务端
+                // ws: true, // 是否启用websockets
+                pathRewrite: {
+                    "^/api": "/"
+                }
+            }
+        }
     }
+
 }
