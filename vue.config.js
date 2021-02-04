@@ -78,11 +78,6 @@ module.exports = {
                             reuseExistingChunk: true,
                             enforce: true
                         },
-                        // elementUI: {
-                        //     name: 'chunk-elementUI', // split elementUI into a single package
-                        //     priority: 20, // the weight needs to be larger than libs and app or it will be packaged into libs or app
-                        //     test: /[\\/]node_modules[\\/]_?element-ui(.*)/ // in order to adapt to cnpm
-                        // },
                         elementUI: {
                             name: "chunk-elementui",
                             test: /[\\/]node_modules[\\/]element-ui[\\/]/,
@@ -162,21 +157,7 @@ module.exports = {
                     args[0].chunksSortMode = "none";
                     return args;
                 });
-
-
-                // config.plugin(`preload-${page}`).tap(() => [{
-                //     rel: 'preload',
-                //     // to ignore runtime.js
-                //     // https://github.com/vuejs/vue-cli/blob/dev/packages/@vue/cli-service/lib/config/app.js#L171
-                //     fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
-                //     // include: 'initial'
-                //     include: []
-                // }])
-                // config.plugins.delete(`prefetch-${page}`);
-                // config.plugins.delete(`preload-${page}`)
             });
-            //     // config.optimization.delete("splitChunks");
-            //     // config.optimization.runtimeChunk('single')
         }
     },
     devServer: {
