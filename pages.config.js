@@ -1,9 +1,9 @@
 module.exports = {
-    'index': {
-        template: 'public/index.html',
-        filename: 'index.html',
-        title: '主页',
-    },
+    // 'index': {
+    //     template: 'public/index.html',
+    //     filename: 'index.html',
+    //     title: '主页',
+    // },
     // 'mobile': {
     //     template: 'public/index.html',
     //     filename: 'mobile.html',
