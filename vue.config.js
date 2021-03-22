@@ -4,7 +4,22 @@ const IS_PROD = ["production", "prod"].includes(process.env.NODE_ENV);
 // const IS_PROD = true
 const glob = require("glob");
 const pagesInfo = require("./pages.config");
-const pages = {};
+const pages = {
+    index: {
+        entry: 'src/main.js',
+        // 模板来源
+        template: 'public/index.html',
+        // 在 dist/index.html 的输出
+        filename: 'index.html',
+        // 当使用 title 选项时，
+        // template 中的 title 标签需要是 <title><%= htmlWebpackPlugin.options.title %></title>
+        title: '主页',
+        // 在这个页面中包含的块，默认情况下会包含
+        // 提取出来的通用 chunk 和 vendor chunk。
+        chunks: ['chunk-vendors', 'chunk-common', 'index']
+    },
+
+};
 
 glob.sync('./src/pages/**/main.js').forEach(entry => {
     let chunk = entry.match(/\.\/src\/pages\/(.*)\/main\.js/)[1];
@@ -18,7 +33,8 @@ glob.sync('./src/pages/**/main.js').forEach(entry => {
     }
 })
 
-console.log(IS_PROD, process.env.NODE_ENV, "IS_PROD")
+console.log(IS_PROD, process.env.NODE_ENV,Object.keys(pages), "IS_PROD")
+
 module.exports = {
     publicPath: IS_PROD ? process.env.VUE_APP_PUBLIC_PATH : "./", // 默认'/'，部署应用包时的基本 URL
     // outputDir: process.env.outputDir || 'dist', // 'dist', 生产环境构建文件的目录
@@ -28,22 +44,7 @@ module.exports = {
     productionSourceMap: !IS_PROD, // 生产环境的 source map
     parallel: require("os").cpus().length > 1,
     pwa: {},
-    pages: {
-        index: {
-            entry: 'src/main.js',
-            // 模板来源
-            template: 'public/index.html',
-            // 在 dist/index.html 的输出
-            filename: 'index.html',
-            // 当使用 title 选项时，
-            // template 中的 title 标签需要是 <title><%= htmlWebpackPlugin.options.title %></title>
-            title: '主页',
-            // 在这个页面中包含的块，默认情况下会包含
-            // 提取出来的通用 chunk 和 vendor chunk。
-            chunks: ['chunk-vendors', 'chunk-common', 'index']
-        },
-        ...pages
-    },
+    pages,
     css: {
         extract: IS_PROD,
         sourceMap: false,
@@ -162,7 +163,7 @@ module.exports = {
             // });
 
 
-            Object.keys(pagesInfo).forEach(page => {
+            Object.keys(pages).forEach(page => {
 
                 config.plugin(`html-${page}`).tap(args => {
                     // html中添加cdn
