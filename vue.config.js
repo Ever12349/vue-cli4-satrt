@@ -114,13 +114,13 @@ module.exports = {
                 }
             };
         } else {
-            config.externals = {
-                'Vue': 'vue',
-                'VueRouter': 'vue-router',
-                'ELEMENT': 'element-ui',
-                Vuex: "vuex",
-                axios: "axios"
-            };
+            // config.externals = {
+            //     'Vue': 'vue',
+            //     'VueRouter': 'vue-router',
+            //     'ELEMENT': 'element-ui',
+            //     Vuex: "vuex",
+            //     axios: "axios"
+            // };
 
         }
 
