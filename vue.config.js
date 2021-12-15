@@ -182,10 +182,10 @@ module.exports = {
         //   errors: true
         // },
         open: true, // 是否打开浏览器
-        // host: "localhost",
+        host: "localhost",
         // port: "8080", // 代理断就
         // https: false,
-        hotOnly: true, // 热更新
+        hot: true, // 热更新
         proxy: {
             "/api": {
                 target: "https://www.easy-mock.com/mock/5bc75b55dc36971c160cad1b/sheets", // 目标代理接口地址
